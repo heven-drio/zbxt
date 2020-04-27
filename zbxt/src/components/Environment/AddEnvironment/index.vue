@@ -9,10 +9,12 @@
       </el-col>
     </el-row>
 
+    <!-- 标题 -->
     <div class="center-main">
       <p>添加环境</p>
       <i class="inline"></i>
 
+      <!-- 添加数据列表 -->
       <div class="add-el-form">
         <el-form
           :model="ruleForm"
@@ -22,17 +24,19 @@
           class="demo-ruleForm"
         >
           <el-form-item label="环境名称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="环境的名称" ></el-input>
+            <el-input v-model="ruleForm.name" placeholder="环境的名称"></el-input>
           </el-form-item>
 
           <el-form-item label="环境介绍" prop="desc">
             <el-input type="textarea" v-model="ruleForm.desc" placeholder="环境的介绍，可选输入。"></el-input>
           </el-form-item>
           <div class="check">
-            <input type="checkbox" />物种已配齐
+             <el-checkbox @click="handleA(index)"  type="is_ready">物种已配齐</el-checkbox>
+            <!-- <input type="is_ready" />物种已配齐 -->
           </div>
         </el-form>
 
+        <!-- 添加图片信息 -->
         <div class="updata">
           <el-upload
             class="upload-demo"
@@ -50,9 +54,11 @@
           </el-upload>
         </div>
 
+        <!-- 提交按钮 -->
         <el-form class="sub-button">
           <el-form-item class="submit">
-            <el-button type="primary" @click="submitForm('ruleForm')" class="right-button">提交</el-button>
+            <el-button type="primary" class="right-button" @click="save">提交</el-button>
+            <!-- <el-button type="primary" @click="submitForm('ruleForm')" class="right-button" @click="addData">提交</el-button> -->
             <el-button @click="resetForm" class="left-button">取消</el-button>
           </el-form-item>
         </el-form>
@@ -62,18 +68,17 @@
 </template>
 
 <script>
+import { addList } from '../../../api/request'
 export default {
   data () {
     return {
+      dataList: [],
+      str: '',
       ruleForm: {
         name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        desc: '',
+        is_ready: '',
+        pic: ''
       },
 
       rules: {
@@ -100,16 +105,14 @@ export default {
     }
   },
   methods: {
-    submitForm (formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          alert('submit!')
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+    save () {
+      // console.log(this.ruleForm.name)
+      console.log(this.dataList.push(this.ruleForm))
+      console.log(this.dataList)
+      this.$emit('save', this.dataList)
+      // console.log(this.save)
     },
+
     resetForm () {
       this.$router.push('/home/environment')
     },
@@ -119,6 +122,18 @@ export default {
     handlePreview (file) {
       console.log(file)
     }
+  },
+  mounted () {
+    var str = ''
+    addList().then(res => {
+      console.log(res)
+      // JSON.parse(str)
+      // str = this.res
+      str = this.dataList
+      console.log(JSON.stringify(str))
+      // str = this.JSON.stringify(str)
+      // console.log(str)
+    })
   }
 }
 </script>
@@ -199,16 +214,16 @@ p {
   width: 100px;
   margin: 15px 10px 0 10px;
 }
-.sub-button{
+.sub-button {
   position: absolute;
   top: 350px;
 }
-.right-button{
+.right-button {
   position: absolute;
   top: 0px;
   left: 0px;
 }
-.left-button{
+.left-button {
   position: absolute;
   top: 0px;
   left: 80px;

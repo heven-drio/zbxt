@@ -10,142 +10,71 @@
     </el-row>
     <!-- 按钮 -->
     <div class="center-main">
-
       <el-row>
         <!-- <el-button class="el-row-button1" type="info" size="small" @click="handleAddEnvironment">添加环境</el-button> -->
-         <router-link to="/home/environment/addEnvironment">
-             <el-button class="el-row-button1" type="info" size="small">添加环境</el-button>
-         </router-link>
-        <el-button class="el-row-button2" type="info" size="small" @click="handleEditEnvironment">编辑环境</el-button>
+        <router-link to="/home/environment/addEnvironment">
+          <el-button class="el-row-button1" type="info" size="small">添加环境</el-button>
+        </router-link>
+        <el-button
+          class="el-row-button2"
+          type="info"
+          size="small"
+          @click="handleEditEnvironment"
+        >编辑环境</el-button>
         <el-button class="el-row-button3" type="info" size="small">删除环境</el-button>
       </el-row>
-       <router-view />
+      <router-view />
       <!-- 表单 -->
-      <el-table :data="tableData" border>
-        <el-table-column prop="ischeck" label="" width="40"  align="center">
-          <input type="radio" @click="isAreaShow">
+      <el-table :data="tableData" border @save="newData">
+        <el-table-column prop="ischeck" label width="40" align="center">
+           <el-checkbox @click="handleA(index)"></el-checkbox>
         </el-table-column>
-        <el-table-column prop="id" label="ID" width="50"  align="center"></el-table-column>
-        <el-table-column prop="name" label="环境名" width="200"  align="center"></el-table-column>
-        <el-table-column prop="introduction" label="环境介绍"  width="400" align="center"></el-table-column>
-        <el-table-column prop="addDate" label="添加日期" width="180"  align="center"></el-table-column>
-        <el-table-column prop="Whether" label="环境物种是否已备齐"  align="center" width="180"></el-table-column>
+        <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
+        <el-table-column prop="name" label="环境名" width="200" align="center"></el-table-column>
+        <el-table-column prop="desc" label="环境介绍" width="400" align="center"></el-table-column>
+        <el-table-column prop="add_date" label="添加日期" width="180" align="center"></el-table-column>
+        <el-table-column prop="is_ready" label="环境物种是否已备齐" align="center" width="180"></el-table-column>
+        <AddEnvironment />
       </el-table>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import AddEnvironment from './AddEnvironment'
+import { getTest } from '../../api/request' // 引入封装后的方法
+
 export default {
   data () {
     return {
-
-      // tableData: [
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     ischeck: true,
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   },
-      //   {
-      //     id: 0,
-      //     name: '城市生态链',
-      //     introduction: '城市里的生态食物链',
-      //     addDate: '2016-05-03',
-      //     Whether: '已备齐'
-      //   }
-      // ]
       tableData: []
+
     }
   },
-
+  clickitem (e) {
+    e === this.radio2 ? this.radio2 = '' : this.radio2 = e
+    console.log(e)
+  },
   mounted () {
-    this.getData()
+    // 获取环境数据列表
+    getTest().then(res => {
+      this.tableData = res.data.data.env
+      console.log(this.tableData)
+    })
+  },
+  components: {
+    AddEnvironment
   },
 
   methods: {
-    isAreaShow () {
-      console.log(length)
-    },
-
     handleEditEnvironment () {
       this.$router.push('/home/environment/editEnvironment')
     },
-
-    getData () {
-      axios.get('../../../data.json').then(Response => {
-        console.log(Response.data.data)
-        this.tableData = Response.data.data
-        console.log(this.tableData)
-      }, Response => {
-        console.log('error')
-      })
+    handleA (index) {
+      console.log(index)
+    },
+    newData (data) {
+      console.log(data)
     }
   }
 

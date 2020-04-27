@@ -1,6 +1,21 @@
 <template>
   <div>
       <el-form :inline="true" class="demo-form-inline">
+          <!-- <el-form-item>
+            <el-input
+              v-model="search"
+              class="search_name"
+              size="mini"
+              placeholder="输入姓名查询">
+            </el-input>
+          </el-form-item> -->
+          <!-- <el-form-item>
+            <el-button
+              type="text"
+              @click="onSearch()"
+              class="el-icon-search">查询
+            </el-button>
+          </el-form-item> -->
           <el-form-item>
             <el-button
               class="el-icon-refresh"
@@ -22,44 +37,37 @@
         border
         style="width: 100%">
         <el-table-column
-          label="ID">
+          label="编号">
           <template slot-scope="scope">
-            <span>{{ scope.row.id }}</span>
+            <span>{{ scope.row.userId }}</span>
           </template>
         </el-table-column>
-
-        <!-- 环境名称 -->
         <el-table-column
-          label="环境名">
+          label="日期">
           <template slot-scope="scope">
-          <div slot="reference" class="name-wrapper">
-                <el-button type="text">{{ scope.row.name }}</el-button>
+            <i class="el-icon-time hidden-sm-and-down"></i>
+            <span>{{ scope.row.userDate }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="姓名">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="right">
+              <p>姓名: {{ scope.row.userName }}</p>
+              <p>住址: {{ scope.row.userAddress }}</p>
+              <p>日期：{{ scope.row.userDate }}</p>
+              <div slot="reference" class="name-wrapper">
+                <el-button type="text">{{ scope.row.userName }}</el-button>
               </div>
+            </el-popover>
           </template>
         </el-table-column>
-
-        <!-- 环境介绍 -->
         <el-table-column
-          label="环境介绍">
+          label="住址">
           <template slot-scope="scope">
-            <span>{{ scope.row.desc }}</span>
+            <span>{{ scope.row.userAddress }}</span>
           </template>
         </el-table-column>
-        <!-- 添加日期 -->
-        <el-table-column
-          label="添加日期">
-          <template slot-scope="scope">
-            <span>{{ scope.row.add_date }}</span>
-          </template>
-        </el-table-column>
-        <!-- 物种环境是否已备齐 -->
-        <el-table-column
-          label="物种环境是否已备齐">
-          <template slot-scope="scope">
-            <span>{{ scope.row.is_ready }}</span>
-          </template>
-        </el-table-column>
-        <!-- 操作 -->
         <el-table-column
           label="操作"
           fixed="right"
@@ -81,31 +89,22 @@
       </el-table>
 
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="70px" class="demo-ruleForm" size="medium">
-        <!-- 添加 -->
         <el-dialog
           title="添加"
           :append-to-body='true'
           :visible.sync="dialogVisible"
           width="80%"
           :before-close="handleClose">
-          <!-- <el-input type="hidden" v-model="ruleForm.userId"/> -->
-          <el-form-item label="环境名" prop="name">
-            <el-input v-model="ruleForm.name"></el-input>
+          <el-input type="hidden" v-model="ruleForm.userId"/>
+          <el-form-item label="时间" prop="userDate">
+            <el-date-picker type="datetime" placeholder="选择日期" v-model="ruleForm.userDate" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="环境介绍" prop="desc">
-            <el-input v-model="ruleForm.desc"></el-input>
+          <el-form-item label="姓名" prop="userName">
+            <el-input v-model="ruleForm.userName"></el-input>
           </el-form-item>
-          <!-- 是否准备完成 -->
-          <el-form-item label="是否准备完成" prop="is_ready">
-            <el-input v-model="ruleForm.is_ready"></el-input>
-          </el-form-item>
-          <!-- pic -->
-          <el-form-item label="是否完成" prop="is_ready">
-            <el-input v-model="ruleForm.is_ready"></el-input>
-          </el-form-item>
-          <!-- <el-form-item label="住址" prop="userAddress">
+          <el-form-item label="住址" prop="userAddress">
             <el-input v-model="ruleForm.userAddress"></el-input>
-          </el-form-item> -->
+          </el-form-item>
 
           <span slot="footer" class="dialog-footer">
             <el-button @click="cancel()" size="medium">取 消</el-button>
@@ -139,7 +138,7 @@
       </el-dialog>
     </el-form>
       <br>
-      <!-- <div class="pages">
+      <div class="pages">
         <el-pagination
           background
           :disabled = "disablePage"
@@ -150,34 +149,30 @@
           :total="total"
           @current-change="handleCurrentChange">
         </el-pagination>
-      </div> -->
+      </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import { getTest, addUser } from '../../api/request'
-
+import { getTest } from '../../api/request'
 export default {
   data () {
     return {
       ruleForm: {
-        id: '',
+        userId: '',
         name: '',
-        desc: '',
-        is_ready: '',
-        pic: 'pic not ready'
+        userDate: '',
+        userAddress: ''
       },
-
       rules: {
         name: [
-          { required: true, message: '请输入环境名', trigger: 'blur' },
+          { required: true, message: '请输入姓名', trigger: 'blur' },
           { min: 2, max: 7, message: '长度在 2 到 7 个字符', trigger: 'blur' }
+        ],
+        userAddress: [
+          { required: true, message: '请输入住址', trigger: 'blur' },
+          { min: 5, message: '长度大于 5 个字符', trigger: 'blur' }
         ]
-        // userAddress: [
-        //   { required: true, message: '请输入住址', trigger: 'blur' },
-        //   { min: 5, message: '长度大于 5 个字符', trigger: 'blur' }
-        // ]
       },
       tableData: [],
       search: '',
@@ -194,18 +189,6 @@ export default {
       this.tableData = res.data.data.env
       console.log(this.tableData)
     })
-
-    addUser().then(res => {
-      // var str = ''
-      // userDate: this.ruleForm.userDate
-      // var str = this.tableData.push(this.ruleForm)
-      // str = this.tableData
-      // // str = this.tableData
-      // console.log(str)
-
-      console.log(res)
-      // this.push(this.ruleForm)
-    })
   },
   methods: {
     handleEdit (index, row) {
@@ -214,80 +197,63 @@ export default {
     },
     handleDelete (index, row) {
       console.log(index, row)
-      console.log(row.id)
-      // this.$confirm('删除操作, 是否继续?', '提示', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // }).then(() => {
-      //   const postData = this.qs.stringify({
-      //     userId: row.userId
-      //   })
-      //     this.axios({
-      //       method: 'post',
-      //       url: '/delete',
-      //       data: postData
-      //     }).then(response => {
-      //       this.getPages()
-      //       this.currentPage = 1
-      //       this.axios.post('/page').then(response => {
-      //         this.tableData = response.data
-      //       }).catch(error => {
-      //         console.log(error)
-      //       })
-      //       this.$message({
-      //         type: 'success',
-      //         message: '删除成功!'
-      //       })
-      //       console.log(response)
-      //     }).catch(error => {
-      //       console.log(error)
-      //     })
-      //   }).catch(() => {
-      //     this.$message({
-      //       type: 'info',
-      //       message: '已取消删除'
-      //     })
-      //   })
-      // },
-      // handleClose (done) {
-      //   this.$confirm('确认关闭？')
-      //     .then(_ => {
-      //       done()
-      //     })
-      //     .catch(_ => {})
-      // },
-      // handleCurrentChange () {
-      //   console.log(`当前页: ${this.currentPage}`)
-      //   const postData = this.qs.stringify({
-      //     page: this.currentPage
-      //   })
-      //   this.axios({
-      //     method: 'post',
-      //     url: '/page',
-      //     data: postData
-      //   }).then(response => {
-      //     this.tableData = response.data
-      //   }).catch(error => {
-      //     console.log(error)
-      //   })
-
-      axios({
-        method: 'post',
-        url: 'http://192.168.94.60:8000/teacher/env/del/',
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        // withCredentials: true,
-        data: {
-          env_id: Number(row.id)
-
-        }
-      }).then((res) => {
-        // console.log(this.ruleForm.id)
-        console.log(res)
+      this.$confirm('删除操作, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const postData = this.qs.stringify({
+          userId: row.userId
+        })
+        this.axios({
+          method: 'post',
+          url: '/delete',
+          data: postData
+        }).then(response => {
+          this.getPages()
+          this.currentPage = 1
+          this.axios.post('/page').then(response => {
+            this.tableData = response.data
+          }).catch(error => {
+            console.log(error)
+          })
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          console.log(response)
+        }).catch(error => {
+          console.log(error)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     },
+    handleClose (done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {})
+    },
+    // handleCurrentChange () {
+    //   console.log(`当前页: ${this.currentPage}`)
+    //   const postData = this.qs.stringify({
+    //     page: this.currentPage
+    //   })
+    //   this.axios({
+    //     method: 'post',
+    //     url: '/page',
+    //     data: postData
+    //   }).then(response => {
+    //     this.tableData = response.data
+    //   }).catch(error => {
+    //     console.log(error)
+    //   })
+    // },
 
     cancel () {
       this.dialogUpdate = false
@@ -301,35 +267,34 @@ export default {
         userAddress: ''
       }
     },
-
-    // 动态添加数据
     addUser () {
-      // console.log(this.tableData.push(this.ruleForm))
-      // console.log(this.tableData)
-
-      const formData = new FormData()
-      for (var key in this.ruleForm) {
-        formData.append(key, this.ruleForm[key])
-      }
-      console.log(formData)
-      axios({
+      const postData = this.qs.stringify({
+        userDate: this.ruleForm.userDate,
+        userName: this.ruleForm.userName,
+        userAddress: this.ruleForm.userAddress
+      })
+      this.axios({
         method: 'post',
-        url: 'http://192.168.94.60:8000/teacher/env/add/',
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        data: {
-          name: this.ruleForm.name,
-          desc: this.ruleForm.desc,
-          is_ready: 0,
-          pic: 'pic not ready'
-
-        }
-      }).then((res) => {
-        console.log(res)
+        url: '/insert',
+        data: postData
+      }).then(response => {
+        this.axios.post('/page').then(response => {
+          this.tableData = response.data
+          this.currentPage = 1
+          this.$message({
+            type: 'success',
+            message: '已添加!'
+          })
+        }).catch(error => {
+          console.log(error)
+        })
+        this.getPages()
+        this.dialogVisible = false
+        console.log(response)
+      }).catch(error => {
+        console.log(error)
       })
     },
-
     updateUser () {
       const postData = this.qs.stringify({
         userId: this.ruleForm.userId,
