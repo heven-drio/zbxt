@@ -209,8 +209,25 @@ export default {
   },
   methods: {
     handleEdit (index, row) {
+      console.log(index, row)
       this.dialogUpdate = true
       this.ruleForm = Object.assign({}, row) // 这句是关键！！！
+      axios({
+        method: 'post',
+        url: 'http://192.168.94.60:8000/teacher/env/edit/',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        // withCredentials: true,
+        data: {
+          // env_id: Number(row.id)
+          name: this.row.name
+
+        }
+      }).then((res) => {
+        // console.log(this.ruleForm.id)
+        console.log(res)
+      })
     },
     handleDelete (index, row) {
       console.log(index, row)

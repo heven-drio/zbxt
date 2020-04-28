@@ -10,71 +10,149 @@
     </el-row>
     <!-- 按钮 -->
     <div class="center-main">
+      <!-- 添加按钮 -->
       <el-row>
-        <!-- <el-button class="el-row-button1" type="info" size="small" @click="handleAddEnvironment">添加环境</el-button> -->
         <router-link to="/home/environment/addEnvironment">
           <el-button class="el-row-button1" type="info" size="small">添加环境</el-button>
         </router-link>
-        <el-button
-          class="el-row-button2"
-          type="info"
-          size="small"
-          @click="handleEditEnvironment"
-        >编辑环境</el-button>
-        <el-button class="el-row-button3" type="info" size="small">删除环境</el-button>
       </el-row>
-      <router-view />
-      <!-- 表单 -->
-      <el-table :data="tableData" border @save="newData">
-        <el-table-column prop="ischeck" label width="40" align="center">
-           <el-checkbox @click="handleA(index)"></el-checkbox>
+      <!-- 表格 -->
+      <div class="table">
+      <el-table
+       :data="tableData"
+        highlight-current-row
+        border
+        style="width: 100%">
+
+        <!-- id -->
+        <el-table-column align="center"
+          label="ID">
+          <template slot-scope="scope">
+            <span>{{ scope.row.id }}</span>
+          </template>
         </el-table-column>
-        <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
-        <el-table-column prop="name" label="环境名" width="200" align="center"></el-table-column>
-        <el-table-column prop="desc" label="环境介绍" width="400" align="center"></el-table-column>
-        <el-table-column prop="add_date" label="添加日期" width="180" align="center"></el-table-column>
-        <el-table-column prop="is_ready" label="环境物种是否已备齐" align="center" width="180"></el-table-column>
-        <AddEnvironment />
+
+        <!-- 环境名称 -->
+        <el-table-column align="center"
+          label="环境名">
+          <template slot-scope="scope">
+          <div slot="reference" class="name-wrapper">
+                <el-button type="text">{{ scope.row.name }}</el-button>
+              </div>
+          </template>
+        </el-table-column>
+
+        <!-- 环境介绍 -->
+        <el-table-column align="center"
+          label="环境介绍">
+          <template slot-scope="scope">
+            <span>{{ scope.row.desc }}</span>
+          </template>
+        </el-table-column>
+
+        <!-- 添加日期 -->
+        <el-table-column align="center"
+          label="添加日期">
+          <template slot-scope="scope">
+            <span>{{ scope.row.add_date }}</span>
+          </template>
+        </el-table-column>
+
+        <!-- 物种环境是否已备齐 -->
+        <el-table-column align="center"
+          label="物种环境是否已备齐">
+          <template slot-scope="scope">
+            <span>{{ scope.row.is_ready }}</span>
+          </template>
+        </el-table-column>
+
+        <!-- 操作 -->
+        <el-table-column align="center"
+          label="操作"
+          fixed="right"
+          width="200">
+          <template slot-scope="scope">
+             <router-link to="/home/environment/EditEnvironment">
+              <el-button align="center"
+              size="mini"
+              icon="el-icon-edit"
+              @click="handleEdit(scope.$index,scope.row)"
+              >编辑
+            </el-button>
+        </router-link>
+            <el-button align="center"
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.$index, scope.row)">删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
+
+      </div>
+      <router-view />
     </div>
   </div>
 </template>
 
 <script>
-import AddEnvironment from './AddEnvironment'
-import { getTest } from '../../api/request' // 引入封装后的方法
-
+import axios from 'axios'
+import { getTest } from '../../api/request'
 export default {
   data () {
     return {
-      tableData: []
-
+      ruleForm: {
+        id: '',
+        name: '',
+        desc: '',
+        is_ready: '',
+        pic: 'pic not ready'
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入环境名', trigger: 'blur' },
+          { min: 2, max: 7, message: '长度在 2 到 7 个字符', trigger: 'blur' }
+        ]
+      },
+      tableData: [],
+      search: '',
+      dialogVisible: false,
+      dialogUpdate: false,
+      pageSize: 5,
+      currentPage: 1,
+      total: 0,
+      disablePage: false
     }
   },
-  clickitem (e) {
-    e === this.radio2 ? this.radio2 = '' : this.radio2 = e
-    console.log(e)
-  },
   mounted () {
-    // 获取环境数据列表
     getTest().then(res => {
       this.tableData = res.data.data.env
       console.log(this.tableData)
     })
   },
-  components: {
-    AddEnvironment
-  },
-
   methods: {
-    handleEditEnvironment () {
-      this.$router.push('/home/environment/editEnvironment')
+    handleDelete (index, row) {
+      console.log(index, row)
+      console.log(row.id)
+      axios({
+        method: 'post',
+        url: 'http://192.168.94.60:8000/teacher/env/del/',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        // withCredentials: true,
+        data: {
+          env_id: Number(row.id)
+
+        }
+      }).then((res) => {
+        // console.log(this.ruleForm.id)
+        console.log(res)
+      })
     },
-    handleA (index) {
-      console.log(index)
-    },
-    newData (data) {
-      console.log(data)
+    handleEdit (index, row) {
+      console.log(row.id)
     }
   }
 

@@ -10,6 +10,9 @@ import Topic from '../components/Topic'
 import StudentSub from '../components/StudentSub'
 import AddEnvironment from '../components/Environment/AddEnvironment'
 import EditEnvironment from '../components/Environment/EditEnvironment'
+import AddSpecies from '../components/Species/AddSpecies'
+import SpeciesRelations from '../components/Species/SpeciesRelations'
+import EditSpecies from '../components/Species/EditSpecies'
 
 Vue.use(VueRouter)
 
@@ -48,7 +51,20 @@ const routes = [
       {
         path: '/home/environment/editEnvironment',
         component: EditEnvironment
+      },
+      {
+        path: '/home/species/addspecies',
+        component: AddSpecies
+      },
+      {
+        path: '/home/species/speciesrelations',
+        component: SpeciesRelations
+      },
+      {
+        path: '/home/species/editspecies',
+        component: EditSpecies
       }
+
     ]
   },
   {

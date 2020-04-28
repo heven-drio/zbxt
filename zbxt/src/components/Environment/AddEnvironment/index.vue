@@ -11,64 +11,45 @@
 
     <!-- 标题 -->
     <div class="center-main">
-      <p>添加环境</p>
-      <i class="inline"></i>
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="环境名称" prop="name">
+          <el-input v-model="ruleForm.name"></el-input>
+        </el-form-item>
 
-      <!-- 添加数据列表 -->
-      <div class="add-el-form">
-        <el-form
-          :model="ruleForm"
-          :rules="rules"
-          ref="ruleForm"
-          label-width="100px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="环境名称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="环境的名称"></el-input>
+        <el-form-item label="环境介绍" prop="desc">
+          <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+        </el-form-item>
+
+        <el-form-item label="是否准备好" prop="pic">
+          <el-input v-model="ruleForm.pic"></el-input>
+        </el-form-item>
+
+        <el-form-item label="是否准备好" prop="is_ready">
+          <el-input v-model="ruleForm.is_ready"></el-input>
+        </el-form-item>
+
+        <div class="e-btn">
+          <el-form-item>
+            <el-button type="primary" @click="submitForm" class="e-btn-1">立即添加</el-button>
+
+            <router-link to="/home/environment">
+              <el-button>取消</el-button>
+            </router-link>
           </el-form-item>
-
-          <el-form-item label="环境介绍" prop="desc">
-            <el-input type="textarea" v-model="ruleForm.desc" placeholder="环境的介绍，可选输入。"></el-input>
-          </el-form-item>
-          <div class="check">
-             <el-checkbox @click="handleA(index)"  type="is_ready">物种已配齐</el-checkbox>
-            <!-- <input type="is_ready" />物种已配齐 -->
-          </div>
-        </el-form>
-
-        <!-- 添加图片信息 -->
-        <div class="updata">
-          <el-upload
-            class="upload-demo"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :file-list="fileList"
-            list-type="picture"
-          >
-            <div class="title-button">
-              <h5>环境背景图片</h5>
-              <el-button size="mini" type="primary" class="el-title-button">点击上传</el-button>
-            </div>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-          </el-upload>
         </div>
-
-        <!-- 提交按钮 -->
-        <el-form class="sub-button">
-          <el-form-item class="submit">
-            <el-button type="primary" class="right-button" @click="save">提交</el-button>
-            <!-- <el-button type="primary" @click="submitForm('ruleForm')" class="right-button" @click="addData">提交</el-button> -->
-            <el-button @click="resetForm" class="left-button">取消</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
-import { addList } from '../../../api/request'
+import axios from 'axios'
 export default {
   data () {
     return {
@@ -89,51 +70,47 @@ export default {
         region: [
           { required: true, message: '请选择活动区域', trigger: 'change' }
         ]
-      },
-      fileList: [
-        {
-          name: 'food.jpeg',
-          url:
-            'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        },
-        {
-          name: 'food2.jpeg',
-          url:
-            'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        }
-      ]
+      }
+      // fileList: [
+      //   {
+      //     name: 'food.jpeg',
+      //     url:
+      //       'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+      //   },
+      //   {
+      //     name: 'food2.jpeg',
+      //     url:
+      //       'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+      //   }
+      // ]
     }
   },
   methods: {
-    save () {
-      // console.log(this.ruleForm.name)
-      console.log(this.dataList.push(this.ruleForm))
-      console.log(this.dataList)
-      this.$emit('save', this.dataList)
-      // console.log(this.save)
-    },
+    submitForm () {
+      //   // console.log(this.tableData.push(this.ruleForm))
+      //   // console.log(this.tableData)
 
-    resetForm () {
-      this.$router.push('/home/environment')
-    },
-    handleRemove (file, fileList) {
-      console.log(file, fileList)
-    },
-    handlePreview (file) {
-      console.log(file)
+      const formData = new FormData()
+      for (var key in this.ruleForm) {
+        formData.append(key, this.ruleForm[key])
+      }
+      console.log(formData)
+      axios({
+        method: 'post',
+        url: 'http://192.168.94.60:8000/teacher/env/add/',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        data: {
+          name: this.ruleForm.name,
+          desc: this.ruleForm.desc,
+          is_ready: 0,
+          pic: 'pic not ready'
+        }
+      }).then(res => {
+        console.log(res)
+      })
     }
-  },
-  mounted () {
-    var str = ''
-    addList().then(res => {
-      console.log(res)
-      // JSON.parse(str)
-      // str = this.res
-      str = this.dataList
-      console.log(JSON.stringify(str))
-      // str = this.JSON.stringify(str)
-      // console.log(str)
-    })
   }
 }
 </script>
@@ -228,4 +205,5 @@ p {
   top: 0px;
   left: 80px;
 }
+
 </style>
